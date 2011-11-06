@@ -148,3 +148,18 @@ func (s *S) TestMany(c *C) {
 
 	c.Check(result.Remaining, Equals, "1*2*3")
 }
+
+func (s *S) TestMany1(c *C) {
+	many := Many1(Literal("*", "star"))
+
+	result := many("!23")
+	c.Check(result.Success, Equals, false)
+
+	result = many("**23")
+	c.Check(result.Success, Equals, true)
+	slice, ok := result.Result.([]interface{})
+	c.Check(ok, Equals, true)
+	c.Check(len(slice), Equals, 2)
+	c.Check(slice[0], Equals, "star")
+	c.Check(slice[1], Equals, "star")
+}
