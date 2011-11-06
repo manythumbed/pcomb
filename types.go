@@ -100,3 +100,11 @@ func Many1(p Parser) Parser {
 	}
 	return Then(p, op)
 }
+
+/* TODO
+Chain combinator
+SepBy combinator
+
+Refactor to use Reader
+Refactor to provide error handling
+*/
