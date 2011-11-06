@@ -1,23 +1,23 @@
 package pcomb
 
-import(
+import (
 	"utf8"
 )
 
-type ParseResult struct	{
-	Success bool
-	Result interface{}
+type ParseResult struct {
+	Success   bool
+	Result    interface{}
 	Remaining string
 }
 
 type Parser func(input string) ParseResult
 
-var Fail Parser = func(input string) ParseResult	{
+var Fail Parser = func(input string) ParseResult {
 	return ParseResult{false, nil, input}
 }
 
 func Succeed(value interface{}) Parser {
-	return func(input string) ParseResult	{
+	return func(input string) ParseResult {
 		return ParseResult{true, value, input}
 	}
 }
@@ -49,7 +49,7 @@ func Or(a, b Parser) Parser {
 }
 
 func Item() Parser {
-	return func (input string) ParseResult	{
+	return func(input string) ParseResult {
 		str := utf8.NewString(input)
 		if str.RuneCount() > 0 {
 			return ParseResult{true, str.Slice(0, 1), str.Slice(1, str.RuneCount())}
@@ -59,7 +59,7 @@ func Item() Parser {
 }
 
 func Satisfy(predicate func(rune int) bool) Parser {
-	op := func (value interface{}) Parser {
+	op := func(value interface{}) Parser {
 		str, ok := value.(string)
 		if ok {
 			rune, _ := utf8.DecodeRuneInString(str)
@@ -72,9 +72,9 @@ func Satisfy(predicate func(rune int) bool) Parser {
 	return Then(Item(), op)
 }
 
-func charEq(str string) func(rune int) bool	{
+func charEq(str string) func(rune int) bool {
 	char, _ := utf8.DecodeRuneInString(str)
-	return func (rune int) bool {
+	return func(rune int) bool {
 		return rune == char
 	}
 }
