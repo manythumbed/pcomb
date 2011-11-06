@@ -85,3 +85,18 @@ func Literal(str string, result interface{}) Parser {
 	}
 	return Succeed(result)
 }
+
+func Many(p Parser) Parser {
+	return Or(Many1(p), Succeed(make([]interface{}, 0)))
+}
+
+func Many1(p Parser) Parser {
+	op := func(x interface{}) Parser {
+		consOp := func(xs interface{}) Parser {
+			slice, _ := xs.([]interface{})
+			return Succeed(append(slice, x))
+		}
+		return Then(Many(p), consOp)
+	}
+	return Then(p, op)
+}

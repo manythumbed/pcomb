@@ -124,5 +124,26 @@ func (s *S) TestLiteral(c *C) {
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, false)
 	c.Check(result.Remaining, Equals, "")
+}
 
+func (s *S) TestMany(c *C) {
+	many := Many(Literal("*", "star"))
+
+	result := many("123")
+	c.Check(result.Success, Equals, true)
+	slice, ok := result.Result.([]interface{})
+	c.Check(ok, Equals, true)
+	c.Check(len(slice), Equals, 0)
+	c.Check(result.Remaining, Equals, "123")
+
+	result = many("***1*2*3")
+	c.Check(result.Success, Equals, true)
+	slice, ok = result.Result.([]interface{})
+	c.Check(ok, Equals, true)
+	c.Check(len(slice), Equals, 3)
+	c.Check(slice[0], Equals, "star")
+	c.Check(slice[1], Equals, "star")
+	c.Check(slice[2], Equals, "star")
+
+	c.Check(result.Remaining, Equals, "1*2*3")
 }
