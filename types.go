@@ -5,31 +5,32 @@ import(
 )
 
 type ParseResult struct	{
+	Success bool
 	Result interface{}
 	Remaining string
 }
 
-type Parser func(input string) (success bool, result ParseResult)
+type Parser func(input string) ParseResult
 
-var Fail Parser = func(input string) (bool, ParseResult)	{
-	return false, ParseResult{nil, input}
+var Fail Parser = func(input string) ParseResult	{
+	return ParseResult{false, nil, input}
 }
 
 func Succeed(value interface{}) Parser {
-	return func(input string) (bool, ParseResult)	{
-		return true, ParseResult{value, input}
+	return func(input string) ParseResult	{
+		return ParseResult{true, value, input}
 	}
 }
 
 type Operation func(value interface{}) Parser
 
 func Then(a Parser, f Operation) Parser {
-	return func(input string) (bool, ParseResult) {
-		success, result := a(input)
-		if success {
+	return func(input string) ParseResult {
+		result := a(input)
+		if result.Success {
 			return f(result.Result)(result.Remaining)
 		}
-		return success, result
+		return result
 	}
 }
 
@@ -38,22 +39,22 @@ func Then_(a, b Parser) Parser {
 }
 
 func Or(a, b Parser) Parser {
-	return func(input string) (bool, ParseResult) {
-		success, result := a(input)
-		if success {
-			return success, result
+	return func(input string) ParseResult {
+		result := a(input)
+		if result.Success {
+			return result
 		}
 		return b(input)
 	}
 }
 
 func Item() Parser {
-	return func (input string) (bool, ParseResult)	{
+	return func (input string) ParseResult	{
 		str := utf8.NewString(input)
 		if str.RuneCount() > 0 {
-			return true, ParseResult{str.Slice(0, 1), str.Slice(1, str.RuneCount())}
+			return ParseResult{true, str.Slice(0, 1), str.Slice(1, str.RuneCount())}
 		}
-		return false, ParseResult{nil, input}
+		return ParseResult{false, nil, input}
 	}
 }
 
