@@ -42,6 +42,10 @@ func Then_(a, b Parser) Parser {
 	return Then(a, func(interface{}) Parser { return b })
 }
 
+func (a Parser) Then_(b Parser) Parser {
+	return Then_(a, b)
+}
+
 func Or(a, b Parser) Parser {
 	return func(input string) ParseResult {
 		result := a(input)
