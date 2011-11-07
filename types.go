@@ -34,10 +34,6 @@ func Then(a Parser, f Operation) Parser {
 	}
 }
 
-type Thener interface {
-	Then(f Operation) Parser
-}
-
 func (p Parser) Then(f Operation) Parser {
 	return Then(p, f)
 }
