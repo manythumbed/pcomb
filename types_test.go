@@ -163,3 +163,27 @@ func (s *S) TestMany1(c *C) {
 	c.Check(slice[0], Equals, "star")
 	c.Check(slice[1], Equals, "star")
 }
+
+func (s *S) TestThen(c *C) {
+	/*
+	fail := func(x interface{}) Parser {
+		return Fail
+	}
+	*/
+	succeed := func(x interface{}) Parser {
+		return Succeed(x)
+	}
+
+	p := Then(Succeed("Y"), succeed)
+	result := p("1234")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Result, Equals, "Y")
+
+	p1 := Succeed("Y").Then(succeed)
+	result = p1("1234")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Result, Equals, "Y")
+}
+
+
+

@@ -34,6 +34,14 @@ func Then(a Parser, f Operation) Parser {
 	}
 }
 
+type Thener interface {
+	Then(f Operation) Parser
+}
+
+func (p Parser) Then(f Operation) Parser {
+	return Then(p, f)
+}
+
 func Then_(a, b Parser) Parser {
 	return Then(a, func(interface{}) Parser { return b })
 }
@@ -100,6 +108,21 @@ func Many1(p Parser) Parser {
 	}
 	return Then(p, op)
 }
+
+/*
+type BinaryOperator func(a, b interface{}) interface{}
+
+
+func chain(x interface{}, p, op Parser) Parser	{
+	return Then(op, func(f interface{}) Parser {
+		Then(p, chain(
+	})
+}
+
+func ChainLeft1(p Parser, op Parser) Parser {
+	return Then(p, something)
+}
+*/
 
 /* TODO
 Chain combinator
