@@ -165,11 +165,6 @@ func (s *S) TestMany1(c *C) {
 }
 
 func (s *S) TestThen(c *C) {
-	/*
-	fail := func(x interface{}) Parser {
-		return Fail
-	}
-	*/
 	succeed := func(x interface{}) Parser {
 		return Succeed(x)
 	}
@@ -185,5 +180,32 @@ func (s *S) TestThen(c *C) {
 	c.Check(result.Result, Equals, "Y")
 }
 
+func (s *S) TestChain(c *C) {
+	one := Literal("1", 1)
+	two := Literal("2", 2)
+	number := Or(one, two)
+
+	result := number("1")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Result, Equals, 1)
+
+	result = number("2")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Result, Equals, 2)
+
+	add := Then_(Literal("+", nil), Succeed(func(x,y int) int { return x + y }))
+	minus := Then_(Literal("-", nil), Succeed(func(x,y int) int { return x - y }))
+	op := Or(add, minus)
+
+	expr := ChainLeft1(number, op)
+
+	result = expr("1+2")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Result, Equals, 3)
+
+	result = expr("1+2-2")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Result, Equals, 1)
+}
 
 

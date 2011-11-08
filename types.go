@@ -1,6 +1,7 @@
 package pcomb
 
 import (
+	"fmt"
 	"utf8"
 )
 
@@ -109,20 +110,29 @@ func Many1(p Parser) Parser {
 	return Then(p, op)
 }
 
-/*
 type BinaryOperator func(a, b interface{}) interface{}
 
-
 func chain(x interface{}, p, op Parser) Parser	{
-	return Then(op, func(f interface{}) Parser {
-		Then(p, chain(
-	})
+	f_func := func(fval interface{}) Parser {
+
+		f, ok := fval.(func(a, b int) int)
+		fmt.Printf("FUNC %v %v", f, ok)
+		x_val, _ := x.(int)
+		y_func := func(y interface{}) Parser {
+			y_val, _ := y.(int)
+			return chain(f(x_val, y_val), p, op)
+		}
+		return Then(p, y_func)
+	}
+	return Or(Then(op, f_func), Succeed(x))
 }
 
 func ChainLeft1(p Parser, op Parser) Parser {
-	return Then(p, something)
+	remainder := func(x interface{}) Parser {
+		return chain(x, p, op)
+	}
+	return Then(p, remainder)
 }
-*/
 
 /* TODO
 Chain combinator
