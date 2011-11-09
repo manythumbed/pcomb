@@ -217,3 +217,17 @@ func (s *S) TestChain(c *C) {
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, 1)
 }
+
+func (s *S) TestSepBy(c *C) {
+	one := Literal("1", 1)
+	two := Literal("2", 2)
+	three := Literal("3", 3)
+	four := Literal("4", 4)
+	number := Or(Or(one, two), Or(three, four))
+
+	listOfNumbers := SeperatedBy(number, Literal(",", nil))
+
+	result := listOfNumbers("1,2,3,4")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Result, Equals, []int{1, 2, 1, 2})
+}

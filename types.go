@@ -2,6 +2,7 @@ package pcomb
 
 import (
 	"utf8"
+	"fmt"
 )
 
 type ParseResult struct {
@@ -129,8 +130,25 @@ func ChainLeft1(p Parser, op Parser) Parser {
 	return Then(p, remainder)
 }
 
+func SeperatedBy(p, sep Parser) Parser {
+	return Or(SeperatedBy1(p, sep), Succeed(make([]interface{}, 0)))
+}
+
+func SeperatedBy1(p, sep Parser) Parser {
+	return Then(p, func(x interface{}) Parser {
+		return Then(seperated(p, sep), func(xs interface{}) Parser {
+			slice, _ := xs.([]interface{})
+			fmt.Println("BLD:", slice, x)
+			return Succeed(append(slice, x))
+		})
+	})
+}
+
+func seperated(p, sep Parser) Parser {
+	return Or(Then_(sep, SeperatedBy1(p, sep)), Succeed(make([]interface{}, 0)))
+}
+
 /* TODO
-Chain combinator
 SepBy combinator
 
 Refactor to use Reader
