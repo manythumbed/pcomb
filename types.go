@@ -1,7 +1,6 @@
 package pcomb
 
 import (
-	"fmt"
 	"utf8"
 )
 
@@ -114,13 +113,9 @@ type BinaryOperator func(a, b interface{}) interface{}
 
 func chain(x interface{}, p, op Parser) Parser	{
 	f_func := func(fval interface{}) Parser {
-
-		f, ok := fval.(func(a, b int) int)
-		fmt.Printf("FUNC %v %v", f, ok)
-		x_val, _ := x.(int)
+		f, _ := fval.(func(a, b interface{}) interface{})
 		y_func := func(y interface{}) Parser {
-			y_val, _ := y.(int)
-			return chain(f(x_val, y_val), p, op)
+			return chain(f(x, y), p, op)
 		}
 		return Then(p, y_func)
 	}

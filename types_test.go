@@ -193,8 +193,18 @@ func (s *S) TestChain(c *C) {
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, 2)
 
-	add := Then_(Literal("+", nil), Succeed(func(x,y int) int { return x + y }))
-	minus := Then_(Literal("-", nil), Succeed(func(x,y int) int { return x - y }))
+	addFunc := func(x_val, y_val interface{}) interface{} {
+		x, _ := x_val.(int)
+		y, _ := y_val.(int)
+		return x + y
+	}
+	minusFunc := func(x_val, y_val interface{}) interface{} {
+		x, _ := x_val.(int)
+		y, _ := y_val.(int)
+		return x - y
+	}
+	add := Then_(Literal("+", nil), Succeed(addFunc))
+	minus := Then_(Literal("-", nil), Succeed(minusFunc))
 	op := Or(add, minus)
 
 	expr := ChainLeft1(number, op)
