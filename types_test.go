@@ -217,5 +217,3 @@ func (s *S) TestChain(c *C) {
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, 1)
 }
-
-

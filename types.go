@@ -111,7 +111,7 @@ func Many1(p Parser) Parser {
 
 type BinaryOperator func(a, b interface{}) interface{}
 
-func chain(x interface{}, p, op Parser) Parser	{
+func chain(x interface{}, p, op Parser) Parser {
 	f_func := func(fval interface{}) Parser {
 		f, _ := fval.(func(a, b interface{}) interface{})
 		y_func := func(y interface{}) Parser {
