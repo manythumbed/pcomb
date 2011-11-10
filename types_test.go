@@ -229,5 +229,7 @@ func (s *S) TestSepBy(c *C) {
 
 	result := listOfNumbers("1,2,3,4")
 	c.Check(result.Success, Equals, true)
-	c.Check(result.Result, Equals, []int{1, 2, 1, 2})
+	slice, ok := result.Result.([]interface{})
+	c.Check(ok, Equals, true)
+	c.Check(slice, Equals, []interface{}{1, 2, 3, 4})
 }

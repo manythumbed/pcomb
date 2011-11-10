@@ -2,7 +2,6 @@ package pcomb
 
 import (
 	"utf8"
-	"fmt"
 )
 
 type ParseResult struct {
@@ -95,15 +94,26 @@ func Literal(str string, result interface{}) Parser {
 	return Succeed(result)
 }
 
+func emptySlice() []interface{} {
+	return make([]interface{}, 0)
+}
+
 func Many(p Parser) Parser {
-	return Or(Many1(p), Succeed(make([]interface{}, 0)))
+	return Or(Many1(p), Succeed(emptySlice()))
+}
+
+func cons(x interface{}, xs []interface{}) []interface{} {
+	if x != nil {
+		return append([]interface{}{x}, xs...)
+	}
+	return xs
 }
 
 func Many1(p Parser) Parser {
 	op := func(x interface{}) Parser {
 		consOp := func(xs interface{}) Parser {
 			slice, _ := xs.([]interface{})
-			return Succeed(append(slice, x))
+			return Succeed(cons(x, slice))
 		}
 		return Then(Many(p), consOp)
 	}
@@ -131,25 +141,23 @@ func ChainLeft1(p Parser, op Parser) Parser {
 }
 
 func SeperatedBy(p, sep Parser) Parser {
-	return Or(SeperatedBy1(p, sep), Succeed(make([]interface{}, 0)))
+	return Or(SeperatedBy1(p, sep), Succeed(emptySlice()))
 }
 
 func SeperatedBy1(p, sep Parser) Parser {
 	return Then(p, func(x interface{}) Parser {
 		return Then(seperated(p, sep), func(xs interface{}) Parser {
 			slice, _ := xs.([]interface{})
-			fmt.Println("BLD:", slice, x)
-			return Succeed(append(slice, x))
+			return Succeed(cons(x, slice))
 		})
 	})
 }
 
 func seperated(p, sep Parser) Parser {
-	return Or(Then_(sep, SeperatedBy1(p, sep)), Succeed(make([]interface{}, 0)))
+	return Or(Then_(sep, SeperatedBy1(p, sep)), Succeed(emptySlice()))
 }
 
 /* TODO
-SepBy combinator
 
 Refactor to use Reader
 Refactor to provide error handling
