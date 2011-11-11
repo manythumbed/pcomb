@@ -58,22 +58,22 @@ func (s *S) TestItem(c *C) {
 	result := item("")
 	c.Check(result.Success, Equals, false)
 	c.Check(result.Result, Equals, nil)
-	c.Check(result.Remaining, Equals, "")
+	c.Check(result.Remaining.Input, Equals, "")
 
 	result = item("123")
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, "1")
-	c.Check(result.Remaining, Equals, "23")
+	c.Check(result.Remaining.Input, Equals, "23")
 
-	result = item(result.Remaining)
+	result = item(result.Remaining.Input)
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, "2")
-	c.Check(result.Remaining, Equals, "3")
+	c.Check(result.Remaining.Input, Equals, "3")
 
-	result = item(result.Remaining)
+	result = item(result.Remaining.Input)
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, "3")
-	c.Check(result.Remaining, Equals, "")
+	c.Check(result.Remaining.Input, Equals, "")
 }
 
 func (s *S) TestSatisfy(c *C) {
@@ -94,12 +94,12 @@ func (s *S) TestSatisfy(c *C) {
 	result = parser("foo")
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, "f")
-	c.Check(result.Remaining, Equals, "oo")
+	c.Check(result.Remaining.Input, Equals, "oo")
 
 	result = parser("123")
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, "1")
-	c.Check(result.Remaining, Equals, "23")
+	c.Check(result.Remaining.Input, Equals, "23")
 }
 
 func (s *S) TestLiteral(c *C) {
@@ -108,7 +108,7 @@ func (s *S) TestLiteral(c *C) {
 	result := literal("yes")
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, true)
-	c.Check(result.Remaining, Equals, "")
+	c.Check(result.Remaining.Input, Equals, "")
 
 	result = literal("no")
 	c.Check(result.Success, Equals, false)
@@ -119,12 +119,12 @@ func (s *S) TestLiteral(c *C) {
 	result = yesno("yes")
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, true)
-	c.Check(result.Remaining, Equals, "")
+	c.Check(result.Remaining.Input, Equals, "")
 
 	result = yesno("no")
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Result, Equals, false)
-	c.Check(result.Remaining, Equals, "")
+	c.Check(result.Remaining.Input, Equals, "")
 }
 
 func (s *S) TestMany(c *C) {
@@ -135,7 +135,7 @@ func (s *S) TestMany(c *C) {
 	slice, ok := result.Result.([]interface{})
 	c.Check(ok, Equals, true)
 	c.Check(len(slice), Equals, 0)
-	c.Check(result.Remaining, Equals, "123")
+	c.Check(result.Remaining.Input, Equals, "123")
 
 	result = many("***1*2*3")
 	c.Check(result.Success, Equals, true)
@@ -146,7 +146,7 @@ func (s *S) TestMany(c *C) {
 	c.Check(slice[1], Equals, "star")
 	c.Check(slice[2], Equals, "star")
 
-	c.Check(result.Remaining, Equals, "1*2*3")
+	c.Check(result.Remaining.Input, Equals, "1*2*3")
 }
 
 func (s *S) TestMany1(c *C) {

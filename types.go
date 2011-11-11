@@ -4,21 +4,35 @@ import (
 	"utf8"
 )
 
+type Position struct {
+	Column, Line int
+}
+
+type State struct {
+	Position
+	Input string
+}
+
+type Error struct {
+	Position
+	Message string
+}
+
 type ParseResult struct {
 	Success   bool
 	Result    interface{}
-	Remaining string
+	Remaining State
 }
 
 type Parser func(input string) ParseResult
 
 var Fail Parser = func(input string) ParseResult {
-	return ParseResult{false, nil, input}
+	return ParseResult{false, nil, State{Input:input}}
 }
 
 func Succeed(value interface{}) Parser {
 	return func(input string) ParseResult {
-		return ParseResult{true, value, input}
+		return ParseResult{true, value, State{Input:input}}
 	}
 }
 
@@ -28,7 +42,7 @@ func Then(a Parser, f Operation) Parser {
 	return func(input string) ParseResult {
 		result := a(input)
 		if result.Success {
-			return f(result.Result)(result.Remaining)
+			return f(result.Result)(result.Remaining.Input)
 		}
 		return result
 	}
@@ -60,9 +74,9 @@ func Item() Parser {
 	return func(input string) ParseResult {
 		str := utf8.NewString(input)
 		if str.RuneCount() > 0 {
-			return ParseResult{true, str.Slice(0, 1), str.Slice(1, str.RuneCount())}
+			return ParseResult{true, str.Slice(0, 1), State{Input:str.Slice(1, str.RuneCount())}}
 		}
-		return ParseResult{false, nil, input}
+		return ParseResult{false, nil, State{Input:input}}
 	}
 }
 
@@ -157,8 +171,11 @@ func seperated(p, sep Parser) Parser {
 	return Or(Then_(sep, SeperatedBy1(p, sep)), Succeed(emptySlice()))
 }
 
-/* TODO
+func Try(p Parser) Parser {
+	return p
+}
 
+/* TODO
 Refactor to use Reader
 Refactor to provide error handling
 */
