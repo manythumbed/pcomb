@@ -10,7 +10,7 @@ type Position struct {
 
 type State struct {
 	Position
-	Remaining string
+	Input string
 }
 
 type Error struct {
@@ -20,36 +20,31 @@ type Error struct {
 
 type Result struct {
 	Success   bool
+	Consumed bool
 	Value    interface{}
-	State
+	Remaining State
 }
 
-type Consumed struct	{
-	ConsumedInput bool
-	Result Result
+type Parser func(input State) Result
+
+func (p Parser) parse(text string) Result	{
+	return p(State{Input:text})
 }
 
-type Parser2 func(input State) Consumed
-type Parser func(input string) Result
-
-func (p Parser2) parse(text string) Result	{
-	return p(State{Remaining:text}).Result
-}
-
-var Fail Parser = func(input string) Result {
-	return Result{false, nil, State{Remaining:input}}
+var Fail Parser = func(input State) Result {
+	return Result{false, false, nil, input}
 }
 
 func Succeed(value interface{}) Parser {
-	return func(input string) Result {
-		return Result{true, value, State{Remaining:input}}
+	return func(input State) Result {
+		return Result{true, false, value, input}
 	}
 }
 
 type Operation func(value interface{}) Parser
 
 func Then(a Parser, f Operation) Parser {
-	return func(input string) Result {
+	return func(input State) Result {
 		result := a(input)
 		if result.Success {
 			return f(result.Value)(result.Remaining)
@@ -71,7 +66,7 @@ func (a Parser) Then_(b Parser) Parser {
 }
 
 func Or(a, b Parser) Parser {
-	return func(input string) Result {
+	return func(input State) Result {
 		result := a(input)
 		if result.Success {
 			return result
@@ -81,12 +76,12 @@ func Or(a, b Parser) Parser {
 }
 
 func Item() Parser {
-	return func(input string) Result {
-		str := utf8.NewString(input)
+	return func(input State) Result {
+		str := utf8.NewString(input.Input)
 		if str.RuneCount() > 0 {
-			return Result{true, str.Slice(0, 1), State{Remaining:str.Slice(1, str.RuneCount())}}
+			return Result{true, true, str.Slice(0, 1), State{Input:str.Slice(1, str.RuneCount())}}
 		}
-		return Result{false, nil, State{Remaining:input}}
+		return Result{false, false, nil, input}
 	}
 }
 

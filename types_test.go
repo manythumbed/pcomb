@@ -17,20 +17,20 @@ type S struct {
 var _ = gocheck.Suite(&S{})
 
 func (s *S) TestFail(c *gocheck.C) {
-	result := Fail("")
+	result := Fail.parse("")
 	c.Check(result.Success, gocheck.Equals, false)
-	c.Check(result, gocheck.NotNil)
+	c.Check(result.Remaining.Input, gocheck.NotNil)
 }
 
 func (s *S) TestSucceed(c *gocheck.C) {
 	value := "test"
 	succeed := Succeed(value)
 
-	result := succeed("")
+	result := succeed.parse("")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, value)
 
-	result = succeed("12345")
+	result = succeed.parse("12345")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, value)
 }
@@ -38,52 +38,52 @@ func (s *S) TestSucceed(c *gocheck.C) {
 func (s *S) TestOr(c *gocheck.C) {
 	or := Or(Fail, Succeed("A"))
 
-	result := or("")
+	result := or.parse("")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "A")
 
 	or = Or(Succeed("A"), Succeed("B"))
-	result = or("")
+	result = or.parse("")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "A")
 
 	or = Or(Succeed("A"), Fail)
-	result = or("")
+	result = or.parse("")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "A")
 }
 
 func (s *S) TestItem(c *gocheck.C) {
 	item := Item()
-	result := item("")
+	result := item.parse("")
 	c.Check(result.Success, gocheck.Equals, false)
 	c.Check(result.Value, gocheck.Equals, nil)
-	c.Check(result.Remaining, gocheck.Equals, "")
+	c.Check(result.Remaining.Input, gocheck.Equals, "")
 
-	result = item("123")
+	result = item.parse("123")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "1")
-	c.Check(result.Remaining, gocheck.Equals, "23")
+	c.Check(result.Remaining.Input, gocheck.Equals, "23")
 
-	result = item(result.Remaining)
+	result = item.parse(result.Remaining.Input)
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "2")
-	c.Check(result.Remaining, gocheck.Equals, "3")
+	c.Check(result.Remaining.Input, gocheck.Equals, "3")
 
-	result = item(result.Remaining)
+	result = item.parse(result.Remaining.Input)
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "3")
-	c.Check(result.Remaining, gocheck.Equals, "")
+	c.Check(result.Remaining.Input, gocheck.Equals, "")
 }
 
 func (s *S) TestSatisfy(c *gocheck.C) {
 	parser := Satisfy(unicode.IsDigit)
-	result := parser("A")
+	result := parser.parse("A")
 
 	c.Check(result.Success, gocheck.Equals, false)
 	c.Check(result.Value, gocheck.Equals, nil)
 
-	result = parser("1")
+	result = parser.parse("1")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "1")
 
@@ -91,53 +91,53 @@ func (s *S) TestSatisfy(c *gocheck.C) {
 	number := Satisfy(unicode.IsDigit)
 	parser = Or(letter, number)
 
-	result = parser("foo")
+	result = parser.parse("foo")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "f")
-	c.Check(result.Remaining, gocheck.Equals, "oo")
+	c.Check(result.Remaining.Input, gocheck.Equals, "oo")
 
-	result = parser("123")
+	result = parser.parse("123")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "1")
-	c.Check(result.Remaining, gocheck.Equals, "23")
+	c.Check(result.Remaining.Input, gocheck.Equals, "23")
 }
 
 func (s *S) TestLiteral(c *gocheck.C) {
 	literal := Literal("yes", true)
 
-	result := literal("yes")
+	result := literal.parse("yes")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, true)
-	c.Check(result.Remaining, gocheck.Equals, "")
+	c.Check(result.Remaining.Input, gocheck.Equals, "")
 
-	result = literal("no")
+	result = literal.parse("no")
 	c.Check(result.Success, gocheck.Equals, false)
 	c.Check(result.Value, gocheck.Equals, nil)
 
 	yesno := Or(Literal("yes", true), Literal("no", false))
 
-	result = yesno("yes")
+	result = yesno.parse("yes")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, true)
-	c.Check(result.Remaining, gocheck.Equals, "")
+	c.Check(result.Remaining.Input, gocheck.Equals, "")
 
-	result = yesno("no")
+	result = yesno.parse("no")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, false)
-	c.Check(result.Remaining, gocheck.Equals, "")
+	c.Check(result.Remaining.Input, gocheck.Equals, "")
 }
 
 func (s *S) TestMany(c *gocheck.C) {
 	many := Many(Literal("*", "star"))
 
-	result := many("123")
+	result := many.parse("123")
 	c.Check(result.Success, gocheck.Equals, true)
 	slice, ok := result.Value.([]interface{})
 	c.Check(ok, gocheck.Equals, true)
 	c.Check(len(slice), gocheck.Equals, 0)
-	c.Check(result.Remaining, gocheck.Equals, "123")
+	c.Check(result.Remaining.Input, gocheck.Equals, "123")
 
-	result = many("***1*2*3")
+	result = many.parse("***1*2*3")
 	c.Check(result.Success, gocheck.Equals, true)
 	slice, ok = result.Value.([]interface{})
 	c.Check(ok, gocheck.Equals, true)
@@ -146,16 +146,16 @@ func (s *S) TestMany(c *gocheck.C) {
 	c.Check(slice[1], gocheck.Equals, "star")
 	c.Check(slice[2], gocheck.Equals, "star")
 
-	c.Check(result.Remaining, gocheck.Equals, "1*2*3")
+	c.Check(result.Remaining.Input, gocheck.Equals, "1*2*3")
 }
 
 func (s *S) TestMany1(c *gocheck.C) {
 	many := Many1(Literal("*", "star"))
 
-	result := many("!23")
+	result := many.parse("!23")
 	c.Check(result.Success, gocheck.Equals, false)
 
-	result = many("**23")
+	result = many.parse("**23")
 	c.Check(result.Success, gocheck.Equals, true)
 	slice, ok := result.Value.([]interface{})
 	c.Check(ok, gocheck.Equals, true)
@@ -170,12 +170,12 @@ func (s *S) TestThen(c *gocheck.C) {
 	}
 
 	p := Then(Succeed("Y"), succeed)
-	result := p("1234")
+	result := p.parse("1234")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "Y")
 
 	p1 := Succeed("Y").Then(succeed)
-	result = p1("1234")
+	result = p1.parse("1234")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, "Y")
 }
@@ -185,11 +185,11 @@ func (s *S) TestChain(c *gocheck.C) {
 	two := Literal("2", 2)
 	number := Or(one, two)
 
-	result := number("1")
+	result := number.parse("1")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, 1)
 
-	result = number("2")
+	result = number.parse("2")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, 2)
 
@@ -209,11 +209,11 @@ func (s *S) TestChain(c *gocheck.C) {
 
 	expr := ChainLeft1(number, op)
 
-	result = expr("1+2")
+	result = expr.parse("1+2")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, 3)
 
-	result = expr("1+2-2")
+	result = expr.parse("1+2-2")
 	c.Check(result.Success, gocheck.Equals, true)
 	c.Check(result.Value, gocheck.Equals, 1)
 }
@@ -227,15 +227,9 @@ func (s *S) TestSepBy(c *gocheck.C) {
 
 	listOfNumbers := SeperatedBy(number, Literal(",", nil))
 
-	result := listOfNumbers("1,2,3,4")
+	result := listOfNumbers.parse("1,2,3,4")
 	c.Check(result.Success, gocheck.Equals, true)
 	slice, ok := result.Value.([]interface{})
 	c.Check(ok, gocheck.Equals, true)
 	c.Check(slice, gocheck.Equals, []interface{}{1, 2, 3, 4})
-}
-
-func (s *S) TestConsumed(c *gocheck.C) {
-	consumed := Consumed{}
-
-	c.Check(consumed.ConsumedInput, gocheck.Equals, false)
 }
