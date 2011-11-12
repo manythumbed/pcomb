@@ -29,7 +29,12 @@ type Consumed struct	{
 	Result Result
 }
 
+type Parser2 func(input State) Consumed
 type Parser func(input string) Result
+
+func (p Parser2) parse(text string) Result	{
+	return p(State{Remaining:text}).Result
+}
 
 var Fail Parser = func(input string) Result {
 	return Result{false, nil, State{Remaining:input}}
