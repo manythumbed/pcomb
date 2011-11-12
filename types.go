@@ -18,31 +18,36 @@ type Error struct {
 	Message string
 }
 
-type ParseResult struct {
+type Result struct {
 	Success   bool
-	Result    interface{}
+	Value    interface{}
 	State
 }
 
-type Parser func(input string) ParseResult
+type Consumed struct	{
+	ConsumedInput bool
+	Result Result
+}
 
-var Fail Parser = func(input string) ParseResult {
-	return ParseResult{false, nil, State{Remaining:input}}
+type Parser func(input string) Result
+
+var Fail Parser = func(input string) Result {
+	return Result{false, nil, State{Remaining:input}}
 }
 
 func Succeed(value interface{}) Parser {
-	return func(input string) ParseResult {
-		return ParseResult{true, value, State{Remaining:input}}
+	return func(input string) Result {
+		return Result{true, value, State{Remaining:input}}
 	}
 }
 
 type Operation func(value interface{}) Parser
 
 func Then(a Parser, f Operation) Parser {
-	return func(input string) ParseResult {
+	return func(input string) Result {
 		result := a(input)
 		if result.Success {
-			return f(result.Result)(result.Remaining)
+			return f(result.Value)(result.Remaining)
 		}
 		return result
 	}
@@ -61,7 +66,7 @@ func (a Parser) Then_(b Parser) Parser {
 }
 
 func Or(a, b Parser) Parser {
-	return func(input string) ParseResult {
+	return func(input string) Result {
 		result := a(input)
 		if result.Success {
 			return result
@@ -71,12 +76,12 @@ func Or(a, b Parser) Parser {
 }
 
 func Item() Parser {
-	return func(input string) ParseResult {
+	return func(input string) Result {
 		str := utf8.NewString(input)
 		if str.RuneCount() > 0 {
-			return ParseResult{true, str.Slice(0, 1), State{Remaining:str.Slice(1, str.RuneCount())}}
+			return Result{true, str.Slice(0, 1), State{Remaining:str.Slice(1, str.RuneCount())}}
 		}
-		return ParseResult{false, nil, State{Remaining:input}}
+		return Result{false, nil, State{Remaining:input}}
 	}
 }
 
@@ -133,8 +138,6 @@ func Many1(p Parser) Parser {
 	}
 	return Then(p, op)
 }
-
-type BinaryOperator func(a, b interface{}) interface{}
 
 func chain(x interface{}, p, op Parser) Parser {
 	f_func := func(fval interface{}) Parser {
