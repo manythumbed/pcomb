@@ -10,7 +10,7 @@ type Position struct {
 
 type State struct {
 	Position
-	Input string
+	Remaining string
 }
 
 type Error struct {
@@ -21,18 +21,18 @@ type Error struct {
 type ParseResult struct {
 	Success   bool
 	Result    interface{}
-	Remaining State
+	State
 }
 
 type Parser func(input string) ParseResult
 
 var Fail Parser = func(input string) ParseResult {
-	return ParseResult{false, nil, State{Input:input}}
+	return ParseResult{false, nil, State{Remaining:input}}
 }
 
 func Succeed(value interface{}) Parser {
 	return func(input string) ParseResult {
-		return ParseResult{true, value, State{Input:input}}
+		return ParseResult{true, value, State{Remaining:input}}
 	}
 }
 
@@ -42,7 +42,7 @@ func Then(a Parser, f Operation) Parser {
 	return func(input string) ParseResult {
 		result := a(input)
 		if result.Success {
-			return f(result.Result)(result.Remaining.Input)
+			return f(result.Result)(result.Remaining)
 		}
 		return result
 	}
@@ -74,9 +74,9 @@ func Item() Parser {
 	return func(input string) ParseResult {
 		str := utf8.NewString(input)
 		if str.RuneCount() > 0 {
-			return ParseResult{true, str.Slice(0, 1), State{Input:str.Slice(1, str.RuneCount())}}
+			return ParseResult{true, str.Slice(0, 1), State{Remaining:str.Slice(1, str.RuneCount())}}
 		}
-		return ParseResult{false, nil, State{Input:input}}
+		return ParseResult{false, nil, State{Remaining:input}}
 	}
 }
 
