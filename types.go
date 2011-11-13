@@ -21,6 +21,7 @@ type Error struct {
 type Result struct {
 	Success   bool
 	Consumed bool
+	Error Error
 	Value    interface{}
 	Remaining State
 }
@@ -32,12 +33,12 @@ func (p Parser) parse(text string) Result	{
 }
 
 var Fail Parser = func(input State) Result {
-	return Result{false, false, nil, input}
+	return Result{false, false, Error{}, nil, input}
 }
 
 func Succeed(value interface{}) Parser {
 	return func(input State) Result {
-		return Result{true, false, value, input}
+		return Result{true, false, Error{}, value, input}
 	}
 }
 
@@ -79,9 +80,9 @@ func Item() Parser {
 	return func(input State) Result {
 		str := utf8.NewString(input.Input)
 		if str.RuneCount() > 0 {
-			return Result{true, true, str.Slice(0, 1), State{Input:str.Slice(1, str.RuneCount())}}
+			return Result{true, true, Error{}, str.Slice(0, 1), State{Input:str.Slice(1, str.RuneCount())}}
 		}
-		return Result{false, false, nil, input}
+		return Result{false, false, Error{}, nil, input}
 	}
 }
 
