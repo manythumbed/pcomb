@@ -100,6 +100,17 @@ func Satisfy(predicate func(rune int) bool) Parser {
 	return Then(Item(), op)
 }
 
+/*
+func Satisfy2(predicate func(rune int) bool) Parser {
+	return func(input State) Result {
+		if input.Column >= len(input.Remaining)	{
+			return Result{false, false, Error{input.Position, "End of line"}}
+		}
+		Fail
+	}
+}
+*/
+
 func charEq(str string) func(rune int) bool {
 	char, _ := utf8.DecodeRuneInString(str)
 	return func(rune int) bool {
