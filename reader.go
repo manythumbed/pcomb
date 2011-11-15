@@ -51,3 +51,7 @@ func (r *reader) untake() os.Error	{
 	}
 	return err
 }
+
+func (r reader) taken() bool {
+	return r.current.line > r.previous.line || r.current.rune > r.previous.rune
+}
