@@ -9,31 +9,31 @@ import (
 
 const newline = int('\n')
 
-type position struct {
+type Position struct {
 	line, rune, column int
 }
 
-func (p position) String() string	{
+func (p Position) String() string	{
 	return fmt.Sprintf("Line %d Rune %d Column %d", p.line, p.rune, p.column)
 }
 
-func (p *position) forward(b int, incLine bool) *position {
+func (p *Position) forward(b int, incLine bool) *Position {
 	if b > 0 {
 		if incLine {
-			return &position{p.line + 1, p.rune + 1, p.column + b}
+			return &Position{p.line + 1, p.rune + 1, p.column + b}
 		}
-		return &position{p.line, p.rune + 1, p.column + b}
+		return &Position{p.line, p.rune + 1, p.column + b}
 	}
 	return p
 }
 
 type reader struct {
 	*bufio.Reader
-	current, previous *position
+	current, previous *Position
 }
 
 func newReader(r io.Reader) reader {
-	return reader{bufio.NewReader(r), &position{1,0,0}, &position{1,0,0}}
+	return reader{bufio.NewReader(r), &Position{1,0,0}, &Position{1,0,0}}
 }
 
 func (r reader) String() string	{

@@ -2,7 +2,9 @@ package pcomb
 
 import (
 	. "launchpad.net/gocheck"
+	"fmt"
 	"testing"
+	"unicode"
 )
 
 func Test(t *testing.T) {
@@ -15,26 +17,45 @@ type S struct {
 
 var _ = Suite(&S{})
 
-/*
-func (s *S) TestFail(c *gocheck.C) {
-	result := Fail.parse("")
-	c.Check(result.Success, gocheck.Equals, false)
-	c.Check(result.Remaining.Input, gocheck.NotNil)
+func (s *S) TestFail(c *C) {
+	result := Fail().parse("")
+	c.Check(result.Success, Equals, false)
+	c.Check(result.Error, Equals, NoErrors)
+	c.Check(result.Value, Equals, nil)
 }
 
-func (s *S) TestSucceed(c *gocheck.C) {
+func (s *S) TestSucceed(c *C) {
 	value := "test"
-	succeed := Succeed(value)
+	succeed := Return(value)
 
 	result := succeed.parse("")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, value)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Error, Equals, NoErrors)
+	c.Check(result.Value, Equals, value)
 
 	result = succeed.parse("12345")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, value)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Error, Equals, NoErrors)
+	c.Check(result.Value, Equals, value)
 }
 
+func (s *S) TestSatisfy(c *C) {
+	sat := Satisfy(unicode.IsDigit)
+
+	result := sat.parse("")
+	c.Check(result.Success, Equals, false)
+	fmt.Println(result)
+
+	result = sat.parse("a")
+	c.Check(result.Success, Equals, false)
+	c.Check(result.Error.Position, Equals, Position{1, 1, 1})
+
+	result = sat.parse("1")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Error, Equals, NoErrors)
+}
+
+/*
 func (s *S) TestOr(c *gocheck.C) {
 	or := Or(Fail, Succeed("A"))
 

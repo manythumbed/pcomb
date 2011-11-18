@@ -2,14 +2,23 @@ package pcomb
 
 import (
 	"strings"
+	"fmt"
 )
 
 type State struct {
 	reader reader
 }
 
+type Error struct {
+	Position Position
+	Message string
+}
+
+var NoErrors = Error{}
+
 type Output struct	{
-	Succeeded bool
+	Success bool
+	Error Error
 	Value interface{}
 	Next State
 }
@@ -22,27 +31,32 @@ func (p Parser) parse(text string) Output	{
 
 func Fail() Parser {
 	return func(state State) Output {
-		return Output{false, nil, state}
+		return Output{false, NoErrors, nil, state}
 	}
 }
 
 func Return(value interface{}) Parser	{
 	return func(state State) Output {
-		return Output{true, value, state}
+		return Output{true, NoErrors, value, state}
 	}
+}
+
+func (s State) error(message string) Error {
+	return Error{*s.reader.current, message}
 }
 
 func Satisfy(predicate func(int) bool) Parser {
 	return func(state State) Output {
 		rune, err := state.reader.take()
 		if err != nil {
-			return Output{false, err, state}
+			return Output{false, state.error("Error reading data"), err, state}
 		}
 		if predicate(rune) {
-			return Output{true, rune, state}
+			return Output{true, Error{}, rune, state}
 		}
+		output := Output{false, state.error(fmt.Sprintf("Character %c does not match predicate", rune)), nil,  state}
 		_ = state.reader.untake()
-		return Output{false, nil,  state}
+		return output
 	}
 }
 
