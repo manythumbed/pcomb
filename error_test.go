@@ -4,9 +4,9 @@ import (
 	. "launchpad.net/gocheck"
 )
 
-func (suite *S) TestNewError(c *C)	{
+func (suite *S) TestNewError(c *C) {
 	s := newState("")
-	
+
 	m := "Test an error"
 	e := NewError(s.Position, m)
 	c.Check(e.Line, Equals, 1)
@@ -16,7 +16,7 @@ func (suite *S) TestNewError(c *C)	{
 	c.Check(len(e.Errors), Equals, 0)
 }
 
-func (suite *S) TestAppend(c *C)	{
+func (suite *S) TestAppend(c *C) {
 	e := NewError(newState("").Position, "Append")
 	c.Check(e.Errors, NotNil)
 	c.Check(len(e.Errors), Equals, 0)

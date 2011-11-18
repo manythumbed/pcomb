@@ -4,7 +4,7 @@ import (
 	. "launchpad.net/gocheck"
 )
 
-func (suite *S) TestNext(c *C)	{
+func (suite *S) TestNext(c *C) {
 	s := newState("")
 
 	rune, next, ok := s.Next()
