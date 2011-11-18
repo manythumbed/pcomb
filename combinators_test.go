@@ -20,7 +20,7 @@ var _ = Suite(&S{})
 func (s *S) TestFail(c *C) {
 	result := Fail().parse("")
 	c.Check(result.Success, Equals, false)
-	c.Check(result.Error, Equals, NoErrors)
+	c.Check(result.Errors, Equals, NoErrors)
 	c.Check(result.Value, Equals, nil)
 }
 
@@ -30,12 +30,12 @@ func (s *S) TestSucceed(c *C) {
 
 	result := succeed.parse("")
 	c.Check(result.Success, Equals, true)
-	c.Check(result.Error, Equals, NoErrors)
+	c.Check(result.Errors, Equals, NoErrors)
 	c.Check(result.Value, Equals, value)
 
 	result = succeed.parse("12345")
 	c.Check(result.Success, Equals, true)
-	c.Check(result.Error, Equals, NoErrors)
+	c.Check(result.Errors, Equals, NoErrors)
 	c.Check(result.Value, Equals, value)
 }
 
@@ -44,36 +44,38 @@ func (s *S) TestSatisfy(c *C) {
 
 	result := sat.parse("")
 	c.Check(result.Success, Equals, false)
-	fmt.Println(result)
 
 	result = sat.parse("a")
 	c.Check(result.Success, Equals, false)
-	c.Check(result.Error.Position, Equals, Position{1, 1, 1})
+	c.Check(result.Errors[0].Position, Equals, Position{1, 1, 1})
 
 	result = sat.parse("1")
 	c.Check(result.Success, Equals, true)
-	c.Check(result.Error, Equals, NoErrors)
+	c.Check(result.Errors, Equals, NoErrors)
+}
+
+func (s *S) TestOr(c *C) {
+	letter := Satisfy(unicode.IsLetter)
+	number := Satisfy(unicode.IsNumber)
+	or := Or(letter, number)
+
+	result := or.parse("")
+	c.Check(result.Success, Equals, false)
+	c.Check(result.Value, Equals, nil)
+	fmt.Println(result)
+
+	result = or.parse("A")
+	fmt.Println(result)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, int('A'))
+
+	result = or.parse("1")
+	fmt.Println(result)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, int('1'))
 }
 
 /*
-func (s *S) TestOr(c *gocheck.C) {
-	or := Or(Fail, Succeed("A"))
-
-	result := or.parse("")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "A")
-
-	or = Or(Succeed("A"), Succeed("B"))
-	result = or.parse("")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "A")
-
-	or = Or(Succeed("A"), Fail)
-	result = or.parse("")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "A")
-}
-
 func (s *S) TestItem(c *gocheck.C) {
 	item := Item()
 	result := item.parse("")

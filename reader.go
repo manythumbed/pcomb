@@ -13,7 +13,7 @@ type Position struct {
 	line, rune, column int
 }
 
-func (p Position) String() string	{
+func (p Position) String() string {
 	return fmt.Sprintf("Line %d Rune %d Column %d", p.line, p.rune, p.column)
 }
 
@@ -33,10 +33,10 @@ type reader struct {
 }
 
 func newReader(r io.Reader) reader {
-	return reader{bufio.NewReader(r), &Position{1,0,0}, &Position{1,0,0}}
+	return reader{bufio.NewReader(r), &Position{1, 0, 0}, &Position{1, 0, 0}}
 }
 
-func (r reader) String() string	{
+func (r reader) String() string {
 	return fmt.Sprintf("Current[%v], Previous[%v]", r.current, r.previous)
 }
 
@@ -46,12 +46,12 @@ func (r *reader) take() (int, os.Error) {
 		r.previous = r.current
 		r.current = r.current.forward(size, rune == newline)
 	}
-	return  rune, err
+	return rune, err
 }
 
-func (r *reader) untake() os.Error	{
+func (r *reader) untake() os.Error {
 	err := r.UnreadRune()
-	if err == nil	{
+	if err == nil {
 		r.current = r.previous
 	}
 	return err

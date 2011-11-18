@@ -2,6 +2,7 @@ package pcomb
 
 import (
 	. "launchpad.net/gocheck"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -36,7 +37,7 @@ func (s *S) TestReader(c *C) {
 	c.Check(r.taken(), Equals, false)
 }
 
-func (s *S) TestLineCounting(c *C)	{
+func (s *S) TestLineCounting(c *C) {
 	r := newReader(strings.NewReader("a\nbb\nc"))
 
 	rune, err := r.take()
@@ -44,7 +45,7 @@ func (s *S) TestLineCounting(c *C)	{
 	c.Check(rune, Equals, int('a'))
 	c.Check(r.current, Not(Equals), r.previous)
 	c.Check(r.current.line, Equals, 1)
-	
+
 	rune, err = r.take()
 	c.Check(err, Equals, nil)
 	c.Check(rune, Equals, int('\n'))
@@ -91,4 +92,19 @@ func (s *S) TestLineCounting(c *C)	{
 	c.Check(rune, Equals, 0)
 	c.Check(r.current, Not(Equals), r.previous)
 	c.Check(r.current.line, Equals, 3)
+}
+
+func (s *S) TestIoReader(c *C) {
+	r := strings.NewReader("ABC\nXYZ\nPQR")
+
+	rune, size, err := r.ReadRune()
+	fmt.Println("READ", rune, size, err)
+	rune, size, err = r.ReadRune()
+	fmt.Println("READ", rune, size, err)
+
+	err = r.UnreadRune()
+	fmt.Println("UNREAD", err)
+	err = r.UnreadRune()
+	fmt.Println("UNREAD", err)
+
 }
