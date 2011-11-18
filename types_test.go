@@ -1,19 +1,19 @@
 package pcomb
 
 import (
-	"launchpad.net/gocheck"
+	. "launchpad.net/gocheck"
 	"testing"
 )
 
 func Test(t *testing.T) {
-	gocheck.TestingT(t)
+	TestingT(t)
 }
 
 type S struct {
 
 }
 
-var _ = gocheck.Suite(&S{})
+var _ = Suite(&S{})
 
 /*
 func (s *S) TestFail(c *gocheck.C) {

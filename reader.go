@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+const newline = int('\n')
+
 type position struct {
 	line, rune, column int
 }
@@ -15,12 +17,15 @@ func (p position) String() string	{
 	return fmt.Sprintf("Line %d Rune %d Column %d", p.line, p.rune, p.column)
 }
 
-func (p *position) forward(b int) *position {
+func (p *position) forward(b int, incLine bool) *position {
 	if b > 0 {
+		if incLine {
+			return &position{p.line + 1, p.rune + 1, p.column + b}
+		}
 		return &position{p.line, p.rune + 1, p.column + b}
 	}
 	return p
-} 
+}
 
 type reader struct {
 	*bufio.Reader
@@ -28,7 +33,7 @@ type reader struct {
 }
 
 func newReader(r io.Reader) reader {
-	return reader{bufio.NewReader(r), &position{}, &position{}}
+	return reader{bufio.NewReader(r), &position{1,0,0}, &position{1,0,0}}
 }
 
 func (r reader) String() string	{
@@ -39,7 +44,7 @@ func (r *reader) take() (int, os.Error) {
 	rune, size, err := r.ReadRune()
 	if err == nil {
 		r.previous = r.current
-		r.current = r.current.forward(size)
+		r.current = r.current.forward(size, rune == newline)
 	}
 	return  rune, err
 }
