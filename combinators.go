@@ -1,5 +1,6 @@
 package pcomb
 
+/*
 import (
 	"strings"
 	"fmt"
@@ -95,3 +96,4 @@ func Try(p Parser) Parser {
 		return output
 	}
 }
+*/

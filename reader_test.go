@@ -1,5 +1,6 @@
 package pcomb
 
+/*
 import (
 	. "launchpad.net/gocheck"
 	"fmt"
@@ -108,3 +109,4 @@ func (s *S) TestIoReader(c *C) {
 	fmt.Println("UNREAD", err)
 
 }
+*/

@@ -2,9 +2,7 @@ package pcomb
 
 import (
 	. "launchpad.net/gocheck"
-	"fmt"
 	"testing"
-	"unicode"
 )
 
 func Test(t *testing.T) {
@@ -16,7 +14,7 @@ type S struct {
 }
 
 var _ = Suite(&S{})
-
+/*
 func (s *S) TestFail(c *C) {
 	result := Fail().parse("")
 	c.Check(result.Success, Equals, false)
@@ -74,6 +72,7 @@ func (s *S) TestOr(c *C) {
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Value, Equals, int('1'))
 }
+*/
 
 /*
 func (s *S) TestItem(c *gocheck.C) {
