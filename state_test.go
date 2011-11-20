@@ -4,6 +4,20 @@ import (
 	. "launchpad.net/gocheck"
 )
 
+func (suite *S) TestEquals(c *C) {
+	s := newState("")
+
+	_, next, _ := s.Next()
+	c.Check(s.Equals(next), Equals, true)
+
+	s = newState("a")
+	_, n1, _ := s.Next()
+	c.Check(s.Equals(n1), Equals, false)
+
+	_, n2, _ := n1.Next()
+	c.Check(n1.Equals(n2), Equals, true)
+}
+
 func (suite *S) TestNext(c *C) {
 	s := newState("")
 

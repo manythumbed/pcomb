@@ -20,6 +20,10 @@ func (s State) increment(rune, size int) Position {
 	return Position{s.Line, s.Rune + 1, s.Column + size}
 }
 
+func (s State) Equals(that State) bool {
+	return s.text == that.text
+}
+
 func newState(text string) State {
 	return State{text, Position{1, 0, 0}}
 }
