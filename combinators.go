@@ -19,6 +19,19 @@ func failure(message string, state State) Output {
 	return Output{false, []Error{NewError(state.Position, message)}, nil, state}
 }
 
+func multipleFailure(message string, state State, outputs ...Output) Output {
+	errors := []Error{}
+	for _, o := range outputs {
+		for _, e := range o.Errors {
+			errors = append(errors, e)
+		}
+	}
+
+	error := NewError(state.Position, message)
+	error.Errors = errors
+	return Output{false, []Error{error}, nil, state}
+}
+
 type Parser func(state State) Output
 
 func (p Parser) parse(text string) Output {
@@ -52,25 +65,21 @@ func Item() Parser {
 	return Satisfy(func(rune int) bool { return true })
 }
 
-/*
-func combineErrors(a, b Output) []Error {
-	return append(a.Errors, b.Errors...)
-}
-
 func Or(a, b Parser) Parser {
 	return func(state State) Output {
-		outputA := a(state)
-		if outputA.Success && outputA.taken() {
-			return outputA
+		outA := a(state)
+		if outA.Success || !state.Equals(outA.State) {
+			return outA
 		}
-		outputB := b(state)
-		if outputB.taken() {
-			return outputB
+		outB := b(state)
+		if outB.Success || !state.Equals(outB.State) {
+			return outB
 		}
-		return Output{false, combineErrors(outputA, outputB), nil, state}
+		return multipleFailure("Both sides of Or expression failed", state, outA, outB)
 	}
 }
 
+/*
 func Try(p Parser) Parser {
 	return func(state State) Output	{
 		output := p(state)

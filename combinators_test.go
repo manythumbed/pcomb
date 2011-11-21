@@ -15,6 +15,7 @@ type S struct {
 }
 
 var _ = Suite(&S{})
+
 func (s *S) TestFail(c *C) {
 	result := Fail.parse("")
 	c.Check(result.Success, Equals, false)
@@ -52,7 +53,6 @@ func (s *S) TestSatisfy(c *C) {
 	c.Check(result.Errors, Equals, NoErrors())
 }
 
-/*
 func (s *S) TestOr(c *C) {
 	letter := Satisfy(unicode.IsLetter)
 	number := Satisfy(unicode.IsNumber)
@@ -61,19 +61,20 @@ func (s *S) TestOr(c *C) {
 	result := or.parse("")
 	c.Check(result.Success, Equals, false)
 	c.Check(result.Value, Equals, nil)
-	fmt.Println(result)
+	c.Check(result.Errors, NotNil)
+	c.Check(len(result.Errors), Equals, 1)
+	c.Check(len(result.Errors[0].Errors), Equals, 2)
 
 	result = or.parse("A")
-	fmt.Println(result)
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Value, Equals, int('A'))
 
 	result = or.parse("1")
-	fmt.Println(result)
-	c.Check(result.Success, Equals, true)
-	c.Check(result.Value, Equals, int('1'))
+	c.Check(result.Success, Equals, false)
+	c.Check(result.Value, Equals, nil)
+	c.Check(result.Errors, NotNil)
+	c.Check(len(result.Errors), Equals, 1)
 }
-*/
 
 /*
 func (s *S) TestItem(c *gocheck.C) {
