@@ -79,14 +79,12 @@ func Or(a, b Parser) Parser {
 	}
 }
 
-/*
 func Try(p Parser) Parser {
 	return func(state State) Output	{
 		output := p(state)
-		if output.taken() && !output.Success	{
-			return Output{false, output.Errors, output.Value, output.Next}
+		if !state.Equals(output.State) && !output.Success	{
+			return Output{false, output.Errors, output.Value, state}
 		}
 		return output
 	}
 }
-*/

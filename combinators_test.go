@@ -100,32 +100,6 @@ func (s *S) TestItem(c *gocheck.C) {
 	c.Check(result.Remaining.Input, gocheck.Equals, "")
 }
 
-func (s *S) TestSatisfy(c *gocheck.C) {
-	parser := Satisfy(unicode.IsDigit)
-	result := parser.parse("A")
-
-	c.Check(result.Success, gocheck.Equals, false)
-	c.Check(result.Value, gocheck.Equals, nil)
-
-	result = parser.parse("1")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "1")
-
-	letter := Satisfy(unicode.IsLetter)
-	number := Satisfy(unicode.IsDigit)
-	parser = Or(letter, number)
-
-	result = parser.parse("foo")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "f")
-	c.Check(result.Remaining.Input, gocheck.Equals, "oo")
-
-	result = parser.parse("123")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "1")
-	c.Check(result.Remaining.Input, gocheck.Equals, "23")
-}
-
 func (s *S) TestLiteral(c *gocheck.C) {
 	literal := Literal("yes", true)
 
