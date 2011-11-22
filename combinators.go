@@ -88,3 +88,15 @@ func Try(p Parser) Parser {
 		return output
 	}
 }
+
+const labelFormat = "Attempted to consume %s and failed"
+
+func Tag(p Parser, label string) Parser {
+	return func(state State) Output	{
+		out := p(state)
+		if !state.Equals(out.State)	{
+			return out
+		}
+		return failure(fmt.Sprintf(labelFormat, label), state)
+	}
+}

@@ -4,6 +4,7 @@ import (
 	. "launchpad.net/gocheck"
 	"testing"
 	"unicode"
+	"fmt"
 )
 
 func Test(t *testing.T) {
@@ -112,6 +113,21 @@ func (s *S) TestTry(c *C) {
 	c.Check(r.Success, Equals, true)
 	c.Check(r.State.text, Equals, "")
 	c.Check(r.Value, Equals, int('1'))
+}
+
+func (s *S) TestTag(c *C) {
+	label := "letter"
+	letter := Tag(Try(Satisfy(unicode.IsLetter)), label)
+
+	r := letter.parse("1")
+	c.Check(r.Success, Equals, false)
+	c.Check(r.Errors, NotNil)
+	c.Check(len(r.Errors), Equals, 1)
+	c.Check(r.Errors[0].Message, Equals, fmt.Sprintf(labelFormat, label))
+
+	r = letter.parse("v")
+	c.Check(r.Success, Equals, true)
+	c.Check(r.Value, Equals, int('v'))
 }
 
 /*
