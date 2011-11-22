@@ -100,3 +100,15 @@ func Tag(p Parser, label string) Parser {
 		return failure(fmt.Sprintf(labelFormat, label), state)
 	}
 }
+
+func Then(p Parser, f func(value interface{}) Parser) Parser {
+	return func(state State) Output	{
+		out1 := p(state)
+		if out1.Success {
+			out2 := f(out1.Value)(out1.State)
+
+			return out2
+		}
+		return out1
+	}
+}
