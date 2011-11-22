@@ -99,6 +99,21 @@ func (s *S) TestItem(c *C) {
 	c.Check(result.Value, Equals, nil)
 }
 
+func (s *S) TestTry(c *C) {
+	letter := Try(Satisfy(unicode.IsLetter))
+
+	r := letter.parse("1")
+	c.Check(r.Success, Equals, false)
+	c.Check(r.State.text, Equals, "1")
+	c.Check(r.Value, Equals, nil)
+
+	number := Try(Satisfy(unicode.IsDigit))
+	r = number.parse(r.State.text)
+	c.Check(r.Success, Equals, true)
+	c.Check(r.State.text, Equals, "")
+	c.Check(r.Value, Equals, int('1'))
+}
+
 /*
 func (s *S) TestLiteral(c *gocheck.C) {
 	literal := Literal("yes", true)
