@@ -76,30 +76,30 @@ func (s *S) TestOr(c *C) {
 	c.Check(len(result.Errors), Equals, 1)
 }
 
-/*
-func (s *S) TestItem(c *gocheck.C) {
+func (s *S) TestItem(c *C) {
 	item := Item()
 	result := item.parse("")
-	c.Check(result.Success, gocheck.Equals, false)
-	c.Check(result.Value, gocheck.Equals, nil)
-	c.Check(result.Remaining.Input, gocheck.Equals, "")
+	c.Check(result.Success, Equals, false)
+	c.Check(result.Value, Equals, nil)
 
 	result = item.parse("123")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "1")
-	c.Check(result.Remaining.Input, gocheck.Equals, "23")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, int('1'))
 
-	result = item.parse(result.Remaining.Input)
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "2")
-	c.Check(result.Remaining.Input, gocheck.Equals, "3")
+	result = item.parse(result.State.text)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, int('2'))
 
-	result = item.parse(result.Remaining.Input)
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "3")
-	c.Check(result.Remaining.Input, gocheck.Equals, "")
+	result = item.parse(result.State.text)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, int('3'))
+
+	result = item.parse(result.State.text)
+	c.Check(result.Success, Equals, false)
+	c.Check(result.Value, Equals, nil)
 }
 
+/*
 func (s *S) TestLiteral(c *gocheck.C) {
 	literal := Literal("yes", true)
 
