@@ -5,6 +5,5 @@ GOFILES=\
 	state.go\
 	error.go\
 	combinators.go\
-	types.go\
 
 include $(GOROOT)/src/Make.pkg
