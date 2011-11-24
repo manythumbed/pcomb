@@ -110,3 +110,9 @@ func Sequence(p Parser, f func(value interface{}) Parser) Parser {
 		return out1
 	}
 }
+
+func Sequence_(a, b Parser) Parser {
+	return Sequence(a, func(ignore interface{}) Parser	{
+		return b
+	})
+}
