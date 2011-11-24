@@ -152,32 +152,32 @@ func (s *S) TestSequence(c *C) {
 	c.Check(r.Value, Equals, int('1'))
 }
 
-/*
-func (s *S) TestLiteral(c *gocheck.C) {
+func (s *S) TestLiteral(c *C) {
 	literal := Literal("yes", true)
 
 	result := literal.parse("yes")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, true)
-	c.Check(result.Remaining.Input, gocheck.Equals, "")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, true)
+	c.Check(result.State.text, Equals, "")
 
 	result = literal.parse("no")
-	c.Check(result.Success, gocheck.Equals, false)
-	c.Check(result.Value, gocheck.Equals, nil)
+	c.Check(result.Success, Equals, false)
+	c.Check(result.Value, Equals, nil)
 
-	yesno := Or(Literal("yes", true), Literal("no", false))
+	yesno := Or(Try(Literal("yes", true)), Try(Literal("no", false)))
 
 	result = yesno.parse("yes")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, true)
-	c.Check(result.Remaining.Input, gocheck.Equals, "")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, true)
+	c.Check(result.State.text, Equals, "")
 
 	result = yesno.parse("no")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, false)
-	c.Check(result.Remaining.Input, gocheck.Equals, "")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, false)
+	c.Check(result.State.text, Equals, "")
 }
 
+/*
 func (s *S) TestMany(c *gocheck.C) {
 	many := Many(Literal("*", "star"))
 

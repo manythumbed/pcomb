@@ -2,6 +2,7 @@ package pcomb
 
 import (
 	"fmt"
+	"utf8"
 )
 
 type Output struct {
@@ -103,11 +104,11 @@ func Tag(p Parser, label string) Parser {
 
 func Sequence(p Parser, f func(value interface{}) Parser) Parser {
 	return func(state State) Output	{
-		out1 := p(state)
-		if out1.Success {
-			return f(out1.Value)(out1.State)
+		out := p(state)
+		if out.Success {
+			return f(out.Value)(out.State)
 		}
-		return out1
+		return out
 	}
 }
 
@@ -115,4 +116,16 @@ func Sequence_(a, b Parser) Parser {
 	return Sequence(a, func(ignore interface{}) Parser	{
 		return b
 	})
+}
+
+func literalRune(rune int) Parser {
+	return Satisfy(func(r int) bool { return rune == r })
+}
+
+func Literal(s string, result interface{}) Parser	{
+	match := utf8.NewString(s)
+	if len(s) == 0 {
+		return Return(result)
+	}
+	return Sequence_(literalRune(match.At(0)), Literal(match.Slice(1, match.RuneCount()), result))
 }
