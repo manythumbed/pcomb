@@ -101,7 +101,7 @@ func Tag(p Parser, label string) Parser {
 	}
 }
 
-func Then(p Parser, f func(value interface{}) Parser) Parser {
+func Sequence(p Parser, f func(value interface{}) Parser) Parser {
 	return func(state State) Output	{
 		out1 := p(state)
 		if out1.Success {

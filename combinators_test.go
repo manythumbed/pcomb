@@ -130,15 +130,26 @@ func (s *S) TestTag(c *C) {
 	c.Check(r.Value, Equals, int('v'))
 }
 
-func (s *S) TestThen(c *C) {
+func (s *S) TestSequence(c *C) {
 	succeed := func(x interface{}) Parser {
 		return Return(x)
 	}
 
-	p := Then(Return("Y"), succeed)
+	p := Sequence(Return("Y"), succeed)
 	result := p.parse("1234")
 	c.Check(result.Success, Equals, true)
 	c.Check(result.Value, Equals, "Y")
+
+	letter := Satisfy(unicode.IsLetter)
+	number := Satisfy(unicode.IsNumber)
+
+	combine := func(x interface{}) Parser {
+		return number
+	}
+	p = Sequence(letter, combine)
+	r := p.parse("a1")
+	c.Check(r.Success, Equals, true)
+	c.Check(r.Value, Equals, int('1'))
 }
 
 /*
@@ -228,8 +239,8 @@ func (s *S) TestChain(c *gocheck.C) {
 		y, _ := y_val.(int)
 		return x - y
 	}
-	add := Then_(Literal("+", nil), Succeed(addFunc))
-	minus := Then_(Literal("-", nil), Succeed(minusFunc))
+	add := Sequence_(Literal("+", nil), Succeed(addFunc))
+	minus := Sequence_(Literal("-", nil), Succeed(minusFunc))
 	op := Or(add, minus)
 
 	expr := ChainLeft1(number, op)
