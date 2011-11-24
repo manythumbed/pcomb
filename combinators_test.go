@@ -130,6 +130,17 @@ func (s *S) TestTag(c *C) {
 	c.Check(r.Value, Equals, int('v'))
 }
 
+func (s *S) TestThen(c *C) {
+	succeed := func(x interface{}) Parser {
+		return Return(x)
+	}
+
+	p := Then(Return("Y"), succeed)
+	result := p.parse("1234")
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, "Y")
+}
+
 /*
 func (s *S) TestLiteral(c *gocheck.C) {
 	literal := Literal("yes", true)
@@ -193,21 +204,6 @@ func (s *S) TestMany1(c *gocheck.C) {
 	c.Check(slice[1], gocheck.Equals, "star")
 }
 
-func (s *S) TestThen(c *gocheck.C) {
-	succeed := func(x interface{}) Parser {
-		return Succeed(x)
-	}
-
-	p := Then(Succeed("Y"), succeed)
-	result := p.parse("1234")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "Y")
-
-	p1 := Succeed("Y").Then(succeed)
-	result = p1.parse("1234")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, "Y")
-}
 
 func (s *S) TestChain(c *gocheck.C) {
 	one := Literal("1", 1)
