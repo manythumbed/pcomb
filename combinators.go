@@ -129,3 +129,30 @@ func Literal(s string, result interface{}) Parser	{
 	}
 	return Sequence_(literalRune(match.At(0)), Literal(match.Slice(1, match.RuneCount()), result))
 }
+
+func cons(x interface{}, xs []interface{}) []interface{} {
+	if x != nil {
+		return append([]interface{}{x}, xs...)
+	}
+	return xs
+}
+
+func emptySlice() []interface{} {
+	return make([]interface{}, 0)
+}
+
+func ZeroOrMore(p Parser) Parser {
+	return Or(OneOrMore(p), Return(emptySlice()))
+}
+
+func OneOrMore(p Parser) Parser {
+	op := func(x interface{}) Parser {
+		consOp := func(xs interface{}) Parser {
+			slice, _ := xs.([]interface{})
+			return Return(cons(x, slice))
+		}
+		return Sequence(ZeroOrMore(p), consOp)
+	}
+	return Sequence(p, op)
+}
+

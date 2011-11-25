@@ -177,45 +177,45 @@ func (s *S) TestLiteral(c *C) {
 	c.Check(result.State.text, Equals, "")
 }
 
-/*
-func (s *S) TestMany(c *gocheck.C) {
-	many := Many(Literal("*", "star"))
+func (s *S) TestZeroOrMore(c *C) {
+	many := ZeroOrMore(Try(Literal("*", "star")))
 
 	result := many.parse("123")
-	c.Check(result.Success, gocheck.Equals, true)
+	c.Check(result.Success, Equals, true)
 	slice, ok := result.Value.([]interface{})
-	c.Check(ok, gocheck.Equals, true)
-	c.Check(len(slice), gocheck.Equals, 0)
-	c.Check(result.Remaining.Input, gocheck.Equals, "123")
+	c.Check(ok, Equals, true)
+	c.Check(len(slice), Equals, 0)
+	c.Check(result.State.text, Equals, "123")
 
 	result = many.parse("***1*2*3")
-	c.Check(result.Success, gocheck.Equals, true)
+	c.Check(result.Success, Equals, true)
 	slice, ok = result.Value.([]interface{})
-	c.Check(ok, gocheck.Equals, true)
-	c.Check(len(slice), gocheck.Equals, 3)
-	c.Check(slice[0], gocheck.Equals, "star")
-	c.Check(slice[1], gocheck.Equals, "star")
-	c.Check(slice[2], gocheck.Equals, "star")
+	c.Check(ok, Equals, true)
+	c.Check(len(slice), Equals, 3)
+	c.Check(slice[0], Equals, "star")
+	c.Check(slice[1], Equals, "star")
+	c.Check(slice[2], Equals, "star")
 
-	c.Check(result.Remaining.Input, gocheck.Equals, "1*2*3")
+	c.Check(result.State.text, Equals, "1*2*3")
 }
 
-func (s *S) TestMany1(c *gocheck.C) {
-	many := Many1(Literal("*", "star"))
+func (s *S) TestOneOrMore(c *C) {
+	many := OneOrMore(Try(Literal("*", "star")))
 
 	result := many.parse("!23")
-	c.Check(result.Success, gocheck.Equals, false)
+	c.Check(result.Success, Equals, false)
 
 	result = many.parse("**23")
-	c.Check(result.Success, gocheck.Equals, true)
+	c.Check(result.Success, Equals, true)
 	slice, ok := result.Value.([]interface{})
-	c.Check(ok, gocheck.Equals, true)
-	c.Check(len(slice), gocheck.Equals, 2)
-	c.Check(slice[0], gocheck.Equals, "star")
-	c.Check(slice[1], gocheck.Equals, "star")
+	c.Check(ok, Equals, true)
+	c.Check(len(slice), Equals, 2)
+	c.Check(slice[0], Equals, "star")
+	c.Check(slice[1], Equals, "star")
 }
 
 
+/*
 func (s *S) TestChain(c *gocheck.C) {
 	one := Literal("1", 1)
 	two := Literal("2", 2)
