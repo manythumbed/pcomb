@@ -268,3 +268,17 @@ func (s *S) TestSepBy(c *C) {
 	c.Check(ok, Equals, true)
 	c.Check(slice, Equals, []interface{}{1, 2, 3, 4})
 }
+
+func (s *S) TestNiceErrors(c *C) {
+	one := Tag(Literal("1", 1), "one")
+	two := Literal("2", 2)
+	three := Literal("3", 3)
+	four := Literal("4", 4)
+	number := Or(Try(Or(Try(one), Try(two))), Or(Try(three), Try(four)))
+
+	listOfNumbers := SeperatedBy(number, Literal(",", nil))
+
+	result := listOfNumbers.parse("1,a,3,4")
+	c.Check(result.Success, Equals, false)
+	fmt.Println(result)
+}
