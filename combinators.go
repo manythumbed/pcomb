@@ -81,9 +81,9 @@ func Or(a, b Parser) Parser {
 }
 
 func Try(p Parser) Parser {
-	return func(state State) Output	{
+	return func(state State) Output {
 		output := p(state)
-		if !state.Equals(output.State) && !output.Success	{
+		if !state.Equals(output.State) && !output.Success {
 			return Output{false, output.Errors, output.Value, state}
 		}
 		return output
@@ -93,9 +93,9 @@ func Try(p Parser) Parser {
 const labelFormat = "Attempted to consume %s and failed"
 
 func Tag(p Parser, label string) Parser {
-	return func(state State) Output	{
+	return func(state State) Output {
 		out := p(state)
-		if !state.Equals(out.State)	{
+		if !state.Equals(out.State) {
 			return out
 		}
 		return failure(fmt.Sprintf(labelFormat, label), state)
@@ -103,7 +103,7 @@ func Tag(p Parser, label string) Parser {
 }
 
 func Sequence(p Parser, f func(value interface{}) Parser) Parser {
-	return func(state State) Output	{
+	return func(state State) Output {
 		out := p(state)
 		if out.Success {
 			return f(out.Value)(out.State)
@@ -113,7 +113,7 @@ func Sequence(p Parser, f func(value interface{}) Parser) Parser {
 }
 
 func Sequence_(a, b Parser) Parser {
-	return Sequence(a, func(ignore interface{}) Parser	{
+	return Sequence(a, func(ignore interface{}) Parser {
 		return b
 	})
 }
@@ -122,7 +122,7 @@ func literalRune(rune int) Parser {
 	return Satisfy(func(r int) bool { return rune == r })
 }
 
-func Literal(s string, result interface{}) Parser	{
+func Literal(s string, result interface{}) Parser {
 	match := utf8.NewString(s)
 	if len(s) == 0 {
 		return Return(result)

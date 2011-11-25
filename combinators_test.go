@@ -214,7 +214,6 @@ func (s *S) TestOneOrMore(c *C) {
 	c.Check(slice[1], Equals, "star")
 }
 
-
 func (s *S) TestChain(c *C) {
 	one := Literal("1", 1)
 	two := Literal("2", 2)
