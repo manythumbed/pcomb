@@ -215,19 +215,18 @@ func (s *S) TestOneOrMore(c *C) {
 }
 
 
-/*
-func (s *S) TestChain(c *gocheck.C) {
+func (s *S) TestChain(c *C) {
 	one := Literal("1", 1)
 	two := Literal("2", 2)
-	number := Or(one, two)
+	number := Or(Try(one), Try(two))
 
 	result := number.parse("1")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, 1)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, 1)
 
 	result = number.parse("2")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, 2)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, 2)
 
 	addFunc := func(x_val, y_val interface{}) interface{} {
 		x, _ := x_val.(int)
@@ -239,34 +238,33 @@ func (s *S) TestChain(c *gocheck.C) {
 		y, _ := y_val.(int)
 		return x - y
 	}
-	add := Sequence_(Literal("+", nil), Succeed(addFunc))
-	minus := Sequence_(Literal("-", nil), Succeed(minusFunc))
-	op := Or(add, minus)
+	add := Sequence_(Literal("+", nil), Return(addFunc))
+	minus := Sequence_(Literal("-", nil), Return(minusFunc))
+	op := Or(Try(add), Try(minus))
 
 	expr := ChainLeft1(number, op)
 
 	result = expr.parse("1+2")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, 3)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, 3)
 
 	result = expr.parse("1+2-2")
-	c.Check(result.Success, gocheck.Equals, true)
-	c.Check(result.Value, gocheck.Equals, 1)
+	c.Check(result.Success, Equals, true)
+	c.Check(result.Value, Equals, 1)
 }
 
-func (s *S) TestSepBy(c *gocheck.C) {
+func (s *S) TestSepBy(c *C) {
 	one := Literal("1", 1)
 	two := Literal("2", 2)
 	three := Literal("3", 3)
 	four := Literal("4", 4)
-	number := Or(Or(one, two), Or(three, four))
+	number := Or(Try(Or(Try(one), Try(two))), Or(Try(three), Try(four)))
 
 	listOfNumbers := SeperatedBy(number, Literal(",", nil))
 
 	result := listOfNumbers.parse("1,2,3,4")
-	c.Check(result.Success, gocheck.Equals, true)
+	c.Check(result.Success, Equals, true)
 	slice, ok := result.Value.([]interface{})
-	c.Check(ok, gocheck.Equals, true)
-	c.Check(slice, gocheck.Equals, []interface{}{1, 2, 3, 4})
+	c.Check(ok, Equals, true)
+	c.Check(slice, Equals, []interface{}{1, 2, 3, 4})
 }
-*/

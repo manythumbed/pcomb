@@ -156,3 +156,37 @@ func OneOrMore(p Parser) Parser {
 	return Sequence(p, op)
 }
 
+func chain(x interface{}, p, op Parser) Parser {
+	f_func := func(fval interface{}) Parser {
+		f, _ := fval.(func(a, b interface{}) interface{})
+		y_func := func(y interface{}) Parser {
+			return chain(f(x, y), p, op)
+		}
+		return Sequence(p, y_func)
+	}
+	return Or(Sequence(op, f_func), Return(x))
+}
+
+func ChainLeft1(p Parser, op Parser) Parser {
+	remainder := func(x interface{}) Parser {
+		return chain(x, p, op)
+	}
+	return Sequence(p, remainder)
+}
+
+func SeperatedBy(p, sep Parser) Parser {
+	return Or(SeperatedBy1(p, sep), Return(emptySlice()))
+}
+
+func SeperatedBy1(p, sep Parser) Parser {
+	return Sequence(p, func(x interface{}) Parser {
+		return Sequence(seperated(p, sep), func(xs interface{}) Parser {
+			slice, _ := xs.([]interface{})
+			return Return(cons(x, slice))
+		})
+	})
+}
+
+func seperated(p, sep Parser) Parser {
+	return Or(Sequence_(sep, SeperatedBy1(p, sep)), Return(emptySlice()))
+}
